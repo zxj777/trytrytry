@@ -1,9 +1,16 @@
 <template>
   <div ref="ganttContainer">
     <svg xmlns="http://www.w3.org/2000/svg">
-      <g class="gantt-layer"></g>
+      <g class="gantt-layout">
+        <rect
+          x="0"
+          y="0"
+          :width="backgroundConfig.width"
+          :height="backgroundConfig.height"
+        ></rect>
+      </g>
       <g class="gantt-date"></g>
-      <g></g>
+      <g class=""></g>
       <g></g>
       <g></g>
     </svg>
@@ -37,7 +44,8 @@ export default {
         ganttEnd: 0,
       },
       backgroundConfig: {
-        width,
+        width: 0,
+        height: 0,
       },
       dates: [],
       drawDates: [],
@@ -48,10 +56,16 @@ export default {
     this.processTaskParams(this.taskParams);
     this.setDates();
     this.getDrawDates();
+    this.handleLayout();
   },
   methods: {
     mergeOptions(optionParams) {
-      const defaultOptions = {};
+      const defaultOptions = {
+        columnWidth: 30,
+        headerHeight: 50,
+        padding: 20,
+        barHeight: 24,
+      };
       this.options = Object.assign({}, defaultOptions, optionParams);
     },
     processTaskParams(taskParams) {
@@ -77,8 +91,6 @@ export default {
         }
       }
 
-      console.log(ganttStart, ganttEnd, 99999);
-
       // 扩大显示，视图默认day模式
       ganttStart = dayjs(ganttStart).minute(1, "month");
       ganttEnd = dayjs(ganttEnd).add(1, "month");
@@ -98,7 +110,20 @@ export default {
       }
       this.dates = dates;
     },
-    getDrawDates() {},
+    handleLayout() {
+      this.setBackground();
+    },
+    setBackground() {
+      const { headerHeight, padding, barHeight, columnWidth } = this.options;
+      const width = this.dates.length * columnWidth;
+      const height =
+        headerHeight + padding + (barHeight + padding) * this.taskList.length;
+      this.backgroundConfig = {
+        width,
+        height,
+      };
+    },
+    // getDrawDates() {},
   },
 };
 </script>
